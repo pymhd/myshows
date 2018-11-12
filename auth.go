@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	AuthURL = "https://myshows.me/oauth/token"
-	GrantType = "password"
+	AuthURL     = "https://myshows.me/oauth/token"
+	GrantType   = "password"
 	ContentType = "Content-Type"
 	PayloadType = "application/json"
 )
@@ -27,10 +27,10 @@ type authResponse struct {
 
 func GetToken(id, scrt, usr, pwd string) (string, error) {
 	ar := authRequest{GrantType, id, scrt, usr, pwd}
-	
+
 	pl, _ := json.Marshal(ar)
 	plr := bytes.NewReader(pl)
-	
+
 	cl := &http.Client{}
 	req, _ := http.NewRequest(http.MethodPost, AuthURL, plr)
 	req.Header.Set(ContentType, PayloadType)
@@ -40,11 +40,11 @@ func GetToken(id, scrt, usr, pwd string) (string, error) {
 		return "", err
 	}
 	defer resp.Body.Close()
-	
+
 	var arp authResponse
 	if err := json.NewDecoder(resp.Body).Decode(&arp); err != nil {
-                return "", err
-        }
+		return "", err
+	}
 
 	return arp.Token, nil
 }
