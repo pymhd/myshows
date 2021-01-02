@@ -17,7 +17,7 @@ type Episode struct {
 
 type EpisodeDesc struct {
 	Show    Show    `json:"show"`
-	Episdoe Episode `json:"episode"`
+	Episode Episode `json:"episode"`
 }
 
 type ShowDesc struct {
