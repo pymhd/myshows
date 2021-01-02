@@ -11,7 +11,7 @@ type Episode struct {
 	ShowID     int    `json:"showId"`
 	SeasonNum  int    `json:"seasonNumber"`
 	EpisodeNum int    `json:"episodeNumber"`
-	Title      string `json:"titleOriginal"`
+	Title      string `json:"title"`
 	Image      string `json:"image"`
 }
 
