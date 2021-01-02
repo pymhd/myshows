@@ -1,4 +1,4 @@
-package main
+package myshows
 
 type Show struct {
 	ID    int    `json:"id"`
