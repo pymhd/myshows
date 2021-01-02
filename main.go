@@ -1,9 +1,8 @@
 package myshows
 
 import (
-	"fmt"
-	"net/http"
 	"sync"
+	"net/http"
 )
 
 type myShows struct {
@@ -32,14 +31,6 @@ func (m *myShows) GetUnwatchedEpisodes() ([]EpisodeDesc, error) {
 
 	return m.getUnwatchedEpisodes()
 }
-
-func (m *myShows) GetShowsList() ([]ShowDesc, error) {
-	m.mu.Lock()
-        defer m.mu.Unlock()
-        
-        return m.getUnwatchedEpisodes
-}
-
 
 func New() *myShows {
 	m := new(myShows)
