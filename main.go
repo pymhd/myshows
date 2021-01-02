@@ -1,74 +1,63 @@
-package myshows
+package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	log "github.com/pymhd/go-logging"
-	_ "io/ioutil"
 	"net/http"
+	"sync"
 )
 
-const (
-	Id                 = 1
-	JsonRPC            = "2.0"
-	ListEpisodesMethod = "lists.Episodes"
-	TopShowMethod      = "shows.Top"
-	ListShowMethod     = "profile.Shows"
-	SearchShowMethod   = "shows.Search"
-	ManageShowMethod   = "manage.SetShowStatus"
-	GetByIdMethod      = "shows.GetById"
-	ApiURL             = "https://api.myshows.me/v2/rpc/"
-)
-
-type Request struct {
-	Id      int                    `json:"id"`
-	JsonRPC string                 `json:"jsonrpc"`
-	Method  string                 `json:"method"`
-	Params  map[string]interface{} `json:"params"`
+type myShows struct {
+	t  string
+	c  *http.Client
+	mu sync.Mutex
 }
 
-var (
-	//some predefined params
-	paramsListUnwatched = map[string]interface{}{"list": "unwatched"}
-)
+func (m *myShows) SetToken(token string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
-func GetNextEpisodes(token string) ([]EpisodeDesc, error) {
-	var epr EpisodesResponse
-	r := Request{Id, JsonRPC, ListEpisodesMethod, paramsListUnwatched}
-
-	resp, err := makeRequst(token, r)
-	if err != nil {
-		return epr.Result, err
-	}
-	defer resp.Body.Close()
-
-	json.NewDecoder(resp.Body).Decode(&epr)
-	if epr.Error.Code != 0 {
-		err = fmt.Errorf("%s", epr.Error.Message)
-	}
-
-	return epr.Result, err
+	m.t = token
 }
 
-func GetShowList(token string) ([]ShowDesc, error) {
-	var sr ShowsResponse
-	r := Request{Id, JsonRPC, ListShowMethod, paramsListUnwatched}
+func (m *myShows) Auth(id, secret, user, password string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
-	resp, err := makeRequst(token, r)
-	if err != nil {
-		return sr.Result, err
-	}
-	defer resp.Body.Close()
-
-	err = json.NewDecoder(resp.Body).Decode(&sr)
-	if sr.Error.Code != 0 {
-		err = fmt.Errorf("%s", sr.Error.Message)
-	}
-
-	return sr.Result, err
-
+	return m.auth(id, secret, user, password)
 }
+
+func (m *myShows) GetUnwatchedEpisodes() ([]EpisodeDesc, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	return m.getUnwatchedEpisodes()
+}
+
+func (m *myShows) GetShowsList() ([]ShowDesc, error) {
+	m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        return m.getUnwatchedEpisodes
+}
+
+
+func New() *myShows {
+	m := new(myShows)
+	m.c = httpClient
+	return m
+}
+
+/*
+func main() {
+	m := New()
+	//m.Auth("myshows_aram808", "CP7Nh2EaGcmVBXnsLv6tyJud", "nemo88", "aram88")
+	m.SetToken("0b468b2ddaa554344a2d25b2b82890da3c4be531")
+	l, _ := m.GetUnwatchedEpisodes()
+	for _, ep := range l {
+		fmt.Printf("%+v\n", ep)
+	}
+}
+
 
 func SearchShow(name string) ([]Show, error) {
 	var slr ShowsLookupResponse
@@ -163,3 +152,5 @@ func makeRequst(t string, r Request) (*http.Response, error) {
 
 	return resp, nil
 }
+
+*/

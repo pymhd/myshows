@@ -1,34 +1,27 @@
-package myshows
+package main
 
 type Show struct {
-	Id            int     `json:"id"`
-	TitleOriginal string  `json:"titleOriginal"`
-	Title         string  `json:"title"`
-	Image         string  `json:"image"`
-	Rating        float64 `json:"rating"`
-	Imdb          int     `json:"imdbId"`
-	Year          int     `json:"year"`
-	Seasons       int     `json:"totalSeasons"`
-	Genres        []int   `json:"genreIds"`
-	Status	      string  `json:"status"`
-	Country	      string  `json:"country"`
+	ID    int    `json:"id"`
+	Title string `json:"titleOriginal"`
+	Image string `json:"image"`
 }
 
 type Episode struct {
-	Id         int    `json:"id"`
-	Title      string `json:"title"`
-	Image      string `json:"image"`
+	ID         int    `json:"id"`
+	ShowID     int    `json:"showId"`
 	SeasonNum  int    `json:"seasonNumber"`
 	EpisodeNum int    `json:"episodeNumber"`
+	Title      string `json:"titleOriginal"`
+	Image      string `json:"image"`
 }
 
 type EpisodeDesc struct {
-	Show    `json:"show"`
-	Episode `json:"episode"`
+	Show    Show    `json:"show"`
+	Episdoe Episode `json:"episode"`
 }
 
 type ShowDesc struct {
-	Show `json:"show"`
+	Show Show `json:"show"`
 }
 
 type Error struct {
@@ -36,27 +29,12 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-type EpisodesResponse struct {
+type EpisodeResponse struct {
 	Result []EpisodeDesc `json:"result"`
 	Error  Error         `json:"error"`
 }
 
-type ShowsResponse struct {
+type ShowResponse struct {
 	Result []ShowDesc `json:"result"`
 	Error  Error      `json:"error"`
-}
-
-type ShowsLookupResponse struct {
-	Result []Show `json:"result"`
-	Error  Error  `json:"error"`
-}
-
-type TopLookupResponse struct {
-	Result []ShowDesc `json:"result"`
-	Error  Error      `json:"error"`
-}
-
-type GetShowByIdResponse struct {
-	Result Show  `json:"result"`
-	Error  Error `json:"error"`
 }

@@ -1,16 +1,15 @@
-package myshows
+package main
 
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
 const (
-	AuthURL     = "https://myshows.me/oauth/token"
-	GrantType   = "password"
-	ContentType = "Content-Type"
-	PayloadType = "application/json"
+	grantType = "password"
+	authUrl   = "https://myshows.me/oauth/token"
 )
 
 type authRequest struct {
@@ -21,30 +20,37 @@ type authRequest struct {
 	Password     string `json:"password"`
 }
 
-type authResponse struct {
-	Token string `json:"access_token"`
+type Token struct {
+	Expire int    `json:"expires_in"`
+	Scope  string `json:"scope"`
+	Token  string `json:"access_token"`
 }
 
-func GetToken(id, scrt, usr, pwd string) (string, error) {
-	ar := authRequest{GrantType, id, scrt, usr, pwd}
+func (m *myShows) auth(id, secret, user, password string) error {
+	ar := authRequest{grantType, id, secret, user, password}
 
 	pl, _ := json.Marshal(ar)
 	plr := bytes.NewReader(pl)
 
-	cl := &http.Client{}
-	req, _ := http.NewRequest(http.MethodPost, AuthURL, plr)
-	req.Header.Set(ContentType, PayloadType)
+	req, _ := http.NewRequest(http.MethodPost, authUrl, plr)
+	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := cl.Do(req)
+	resp, err := m.c.Do(req)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer resp.Body.Close()
 
-	var arp authResponse
-	if err := json.NewDecoder(resp.Body).Decode(&arp); err != nil {
-		return "", err
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("status code is %d", resp.StatusCode)
 	}
 
-	return arp.Token, nil
+	var t Token
+	if err := json.NewDecoder(resp.Body).Decode(&t); err != nil {
+		return err
+	}
+	fmt.Println(t.Token, t.Scope, t.Expire)
+	m.t = t.Token
+
+	return nil
 }
